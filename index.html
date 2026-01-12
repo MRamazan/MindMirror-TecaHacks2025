@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMirror - Cognitive Assessment Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #e8eaed;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background: rgba(30, 40, 50, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 2rem 2rem 2rem;
+            border-bottom: 2px solid #4a5568;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            color: #60a5fa;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 0.5rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: rgba(96, 165, 250, 0.1);
+            color: #60a5fa;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 1rem;
+            stroke-width: 2;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 3rem;
+            min-height: 100vh;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-header {
+            margin-bottom: 2rem;
+        }
+
+        .content-header h2 {
+            font-size: 2.5rem;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+
+        .content-header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        /* Card Styling */
+        .card {
+            background: rgba(30, 40, 50, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .placeholder {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Speed Test Styles */
+        .speed-test-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .speed-instructions {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .speed-instructions ol {
+            color: #cbd5e1;
+            padding-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .speed-instructions li {
+            margin-bottom: 0.5rem;
+        }
+
+        .speed-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .control-group select {
+            background: rgba(15, 23, 42, 0.6);
+            color: #e8eaed;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .font-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .font-controls span {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .font-button {
+            background: transparent;
+            color: #60a5fa;
+            border: 1px solid #60a5fa;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .font-button:hover {
+            background: #60a5fa;
+            color: white;
+        }
+
+        .timer-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .text-container {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            line-height: 1.9;
+            max-height: 2000px;
+            overflow-y: auto;
+        }
+
+        .text-container p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        .fontSmaller {
+            font-size: 0.85em;
+        }
+
+        .fontLarger {
+            font-size: 1.15em;
+        }
+
+        .lineSmaller p {
+            line-height: 1.5;
+        }
+
+        .lineLarger p {
+            line-height: 2.3;
+        }
+
+        /* Quiz Styles */
+        .quiz-container {
+            background: rgba(30, 40, 50, 0.6);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .quiz-container.active {
+            display: block;
+        }
+
+        .quiz-question {
+            font-size: 1.2rem;
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #e8eaed;
+        }
+
+        .quiz-option:hover {
+            border-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+        }
+
+        .quiz-option.selected {
+            border-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.2);
+        }
+
+        .quiz-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        /* Results Styles */
+        .results-container {
+            background: rgba(30, 40, 50, 0.6);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .results-header h3 {
+            font-size: 2rem;
+            color: #60a5fa;
+            margin-bottom: 1rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .result-card {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 3rem;
+            color: #60a5fa;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .restart-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .restart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Chatbot Specific Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.bot {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .message-avatar.user {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            line-height: 1.6;
+        }
+
+        .message-content.bot {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .message-content.user {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 1rem;
+            background: rgba(30, 40, 50, 0.6);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            color: #e8eaed;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+        }
+
+        .chat-input::placeholder {
+            color: #64748b;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            max-width: fit-content;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #60a5fa;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        /* Articles Grid */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .article-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .article-card h3 {
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+        }
+
+        .article-card a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .article-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .logo p,
+            .nav-link span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 2rem 1rem;
+            }
+
+            .nav-icon {
+                margin-right: 0;
+            }
+
+            .nav-item {
+                margin: 0.5rem 0.5rem;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .speed-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h1>MindMirror</h1>
+                <p>Cognitive Assessment</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-page="main">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        <span>Main</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="experiments">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span>Reading Test</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+    <a class="nav-link" data-page="digitspan">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+        </svg>
+        <span>Digit Span Test</span>
+    </a>
+</li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="chatbot">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        <span>Chatbot</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="articles">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <span>Articles</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Main Page -->
+            <section class="content-section active" id="main">
+                <div class="content-header">
+                    <h2>Welcome to MindMirror</h2>
+                    <p>Track your cognitive performance and digital wellness</p>
+                </div>
+                <div class="card">
+                    <div style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+
+                            <h3 style="color: #60a5fa; font-size: 1.8rem; margin-bottom: 1rem;">Understanding Your Mind</h3>
+                        </div>
+
+                       <div style="color: #cbd5e1; line-height: 1.8; text-align: left; margin-bottom: 2rem;">
+                            <p style="margin-bottom: 1.5rem;">
+                                <strong style="color: #60a5fa;">MindMirror</strong> is a cognitive assessment platform designed to help you understand and track your mental performance. In our digital age, excessive screen time and information overload can impact our cognitive abilities without us realizing it.
+                            </p>
+                            <p style="margin-bottom: 1.5rem;">
+                                Through interactive assessments and an AI-powered mental health assistant, we help you monitor your reading speed, working memory, and overall cognitive wellness. Whether you're a student, professional, or anyone curious about digital wellness, MindMirror offers a simple way to check in with your mind and learn about your cognitive patterns.
+                            </p>
+                        </div>
+                        <div style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; border: 1px solid rgba(148, 163, 184, 0.2);">
+                            <h4 style="color: #60a5fa; margin-bottom: 1.5rem; font-size: 1.3rem;">What You Can Do</h4>
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="display: flex; gap: 1rem; align-items: start;">
+                                    <span style="font-size: 1.5rem;">📖</span>
+                                    <div>
+                                        <strong style="color: #94a3b8;">Reading Speed Test</strong>
+                                        <p style="color: #cbd5e1; margin-top: 0.3rem; font-size: 0.95rem;">Measure your reading speed and comprehension with classic literature excerpts</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 1rem; align-items: start;">
+                                    <span style="font-size: 1.5rem;">🔢</span>
+                                    <div>
+                                        <strong style="color: #94a3b8;">Digit Span Test</strong>
+                                        <p style="color: #cbd5e1; margin-top: 0.3rem; font-size: 0.95rem;">Assess your working memory capacity and attention span</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 1rem; align-items: start;">
+                                    <span style="font-size: 1.5rem;">💬</span>
+                                    <div>
+                                        <strong style="color: #94a3b8;">AI Mental Health Assistant</strong>
+                                        <p style="color: #cbd5e1; margin-top: 0.3rem; font-size: 0.95rem;">Chat with supportive AI about mental wellness and cognitive health</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 1rem; align-items: start;">
+                                    <span style="font-size: 1.5rem;">📚</span>
+                                    <div>
+                                        <strong style="color: #94a3b8;">Educational Resources</strong>
+                                        <p style="color: #cbd5e1; margin-top: 0.3rem; font-size: 0.95rem;">Read about digital wellness and cognitive health through curated articles</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                            <p style="color: #cbd5e1; margin-bottom: 1rem;">
+                                <strong style="color: #60a5fa;">Start Your Journey:</strong> Use the navigation menu to explore cognitive tests and learn about your mental performance.
+                            </p>
+                         
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experiments Page -->
+            <section class="content-section" id="experiments">
+                <div class="content-header">
+                    <h2>Reading Speed Test</h2>
+                    <p>Measure your reading speed and comprehension</p>
+                </div>
+                <div class="card">
+                    <div class="speed-test-container">
+                        <div class="speed-instructions">
+                            <ol>
+                                <li>Select a book from the dropdown menu</li>
+                                <li>Adjust font size and line spacing if needed</li>
+                                <li>Click "Start" and begin reading</li>
+                                <li>Click "Finished Reading" when you're done</li>
+                                <li>Answer comprehension questions</li>
+                            </ol>
+                        </div>
+
+                        <div class="speed-controls">
+                            <div class="control-group">
+                                <label for="testBook">Choose a Book:</label>
+                                <select id="testBook">
+                                    <option value="1">Adventures of Huckleberry Finn</option>
+                                    <option value="9">A Scandal in Bohemia</option>
+                                    <option value="10">The Adventures of Tom Sawyer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="font-controls">
+                            <span>Font Size:</span>
+                            <button class="font-button" onclick="modText.size('smaller')">A-</button>
+                            <button class="font-button" onclick="modText.size('normal')">A</button>
+                            <button class="font-button" onclick="modText.size('larger')">A+</button>
+                            <span style="margin-left: 2rem;">Line Spacing:</span>
+                            <button class="font-button" onclick="modText.lineSpacing('smaller')">↕-</button>
+                            <button class="font-button" onclick="modText.lineSpacing('normal')">↕</button>
+                            <button class="font-button" onclick="modText.lineSpacing('larger')">↕+</button>
+                        </div>
+
+
+                        <div class="timer-section" style="text-align: center;">
+    <button class="restart-button" onclick="restartTest()" style="display: inline-block; margin: 0 5px;">Restart</button>
+    <div class="timer-display" id="time" style="display: inline-block; min-width: 50px; text-align: center; margin: 0 5px;">0:00</div>
+
+    <button class="test-button" id="startButton" onclick="timer.start()" style="display: inline-block; margin: 0 5px;">Start Reading</button>
+    <button class="test-button" id="testButton" style="display: none; margin: 0 5px;">Finished Reading</button>
+
+    <button class="test-button" id="restartExperiment" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); display: none; margin: 0 5px;">Restart Experiment</button>
+</div>
+
+                        <div class="text-container" id="testTextCon"></div>
+
+                        <!-- Quiz Container -->
+                        <div class="quiz-container" id="quizContainer">
+                            <div class="quiz-question" id="quizQuestion"></div>
+                            <div class="quiz-options" id="quizOptions"></div>
+                            <div class="quiz-navigation">
+                                <button class="test-button" id="nextQuestion" style="margin-left: auto;">Next Question</button>
+                            </div>
+                        </div>
+
+                        <!-- Results Container -->
+                        <!-- Results Container -->
+<div class="results-container" id="resultsContainer">
+    <div class="results-header">
+        <h3>Test Results</h3>
+    </div>
+    <div class="results-grid">
+        <div class="result-card">
+            <div class="result-value" id="wpmResult">0</div>
+            <div class="result-label">Words Per Minute</div>
+        </div>
+        <div class="result-card">
+            <div class="result-value" id="quizScore">0/5</div>
+            <div class="result-label">Correct Answers</div>
+        </div>
+
+    </div>
+
+    <!-- Analysis -->
+    <div style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; border: 1px solid rgba(148, 163, 184, 0.2);">
+        <h4 style="color: #60a5fa; margin-bottom: 1rem; font-size: 1.2rem;">📊 Analysis</h4>
+        <div id="wpmAnalysis" style="color: #cbd5e1; line-height: 1.8; margin-bottom: 1.5rem;"></div>
+        <div id="comprehensionAnalysis" style="color: #cbd5e1; line-height: 1.8;"></div>
+    </div>
+
+    <!-- Age-Based Statistics Table -->
+    <div style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; border: 1px solid rgba(148, 163, 184, 0.2);">
+        <h4 style="color: #60a5fa; margin-bottom: 1rem; font-size: 1.2rem;">📈 Average Reading Speed by Age</h4>
+        <table style="width: 100%; border-collapse: collapse; color: #cbd5e1;">
+            <thead>
+                <tr style="border-bottom: 2px solid rgba(96, 165, 250, 0.3);">
+                    <th style="padding: 0.75rem; text-align: left; color: #60a5fa;">Age Group</th>
+                    <th style="padding: 0.75rem; text-align: left; color: #60a5fa;">Average WPM</th>
+                    <th style="padding: 0.75rem; text-align: left; color: #60a5fa;">Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
+                    <td style="padding: 0.75rem;">Children (Elementary)</td>
+                    <td style="padding: 0.75rem;">80–185 WPM</td>
+                    <td style="padding: 0.75rem;"><a href="https://irisreading.com/average-reading-speed-in-various-languages/" target="_blank" style="color: #60a5fa; text-decoration: none;">Iris Reading</a></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
+                    <td style="padding: 0.75rem;">Young Adults (18–40)</td>
+                    <td style="padding: 0.75rem;">200–320 WPM</td>
+                    <td style="padding: 0.75rem;"><a href="https://www.audio-reader.com/reading-speed/" target="_blank" style="color: #60a5fa; text-decoration: none;">Audio-Reader</a></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
+                    <td style="padding: 0.75rem;">Adults (40–60)</td>
+                    <td style="padding: 0.75rem;">175–300 WPM</td>
+                    <td style="padding: 0.75rem;"><a href="https://www.audio-reader.com/reading-speed/" target="_blank" style="color: #60a5fa; text-decoration: none;">Audio-Reader</a></td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.75rem;">Seniors (60+)</td>
+                    <td style="padding: 0.75rem;">175–250 WPM</td>
+                    <td style="padding: 0.75rem;"><a href="https://www.audio-reader.com/reading-speed/" target="_blank" style="color: #60a5fa; text-decoration: none;">Audio-Reader</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <button class="restart-button" onclick="restartTest()">Take Another Test</button>
+</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Digit Span Test Page -->
+<section class="content-section" id="digitspan">
+    <div class="content-header">
+        <h2>Digit Span Test</h2>
+        <p>Test your working memory capacity</p>
+    </div>
+    <div class="card">
+        <div class="speed-test-container">
+            <div class="speed-instructions">
+                <p style="text-align: left; margin-bottom: 1rem; font-size: 1.1rem; color: #cbd5e1;">
+                    Numbers will appear on the screen one by one. Remember them in order and type them back when prompted. The digit span test measures short-term memory and attention capacity.
+                </p>
+                <ol>
+                    <li>Click "Start Test" to begin</li>
+                    <li>Watch the numbers appear one at a time</li>
+                    <li>After all numbers are shown, type them in the same order</li>
+                    <li>The test gets progressively harder with more digits</li>
+                    <li>You get 2 attempts per level</li>
+                </ol>
+            </div>
+
+            <div id="digitSpanGame" style="text-align: center;">
+                <button class="test-button" id="startDigitTest" style="margin: 2rem auto; display: block;">
+                    Start Test
+                </button>
+
+                <div id="digitDisplay" style="display: none;">
+                    <div style="font-size: 8rem; font-weight: 700; color: #60a5fa; margin: 3rem 0; min-height: 150px; display: flex; align-items: center; justify-content: center;" id="digitNumber"></div>
+                    <div style="color: #94a3b8; font-size: 1.1rem;">Level <span id="currentLevel">1</span></div>
+                </div>
+
+                <div id="digitInput" style="display: none; margin-top: 2rem;">
+                    <p style="color: #cbd5e1; font-size: 1.2rem; margin-bottom: 1rem;">Enter the numbers you saw:</p>
+                    <input
+                        type="text"
+                        id="digitAnswer"
+                        class="chat-input"
+                        style="max-width: 400px; margin: 0 auto; display: block; text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;"
+                        placeholder="Type numbers..."
+                        autocomplete="off"
+                    >
+                    <button class="test-button" id="submitDigits" style="margin-top: 1.5rem;">Submit</button>
+                </div>
+
+                <div id="digitFeedback" style="margin-top: 2rem; font-size: 1.2rem; min-height: 30px;"></div>
+            </div>
+
+            <!-- Digit Span Results -->
+
+<div class="results-container" id="digitResultsContainer">
+    <div class="results-header">
+        <h3>Test Complete!</h3>
+    </div>
+    <div class="results-grid" style="grid-template-columns: 1fr;">
+        <div class="result-card">
+            <div class="result-value" id="digitSpanScore">0</div>
+            <div class="result-label">Maximum Digit Span</div>
+            <p style="color: #94a3b8; margin-top: 1rem; font-size: 0.9rem;">
+                Average adult span: 5-9 digits
+            </p>
+        </div>
+    </div>
+
+    <!-- Digit Span Analysis -->
+    <div style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; border: 1px solid rgba(148, 163, 184, 0.2);">
+        <h4 style="color: #60a5fa; margin-bottom: 1rem; font-size: 1.2rem;">🧠 Working Memory Assessment</h4>
+        <div id="digitSpanAnalysis" style="color: #cbd5e1; line-height: 1.8;"></div>
+    </div>
+
+    <button class="restart-button" onclick="restartDigitTest()">Take Another Test</button>
+</div>
+        </div>
+    </div>
+</section>
+
+            <!-- Chatbot Page -->
+            <section class="content-section" id="chatbot">
+                <div class="content-header">
+                    <h2>Mental Health Assistant</h2>
+                    <p>Chat with our AI-powered mental health support bot</p>
+                </div>
+                <div class="card">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-message bot">
+                                <div class="message-avatar bot">🤖</div>
+                                <div class="message-content bot">
+                                    Hello! I'm your mental health assistant. I'm here to support you with questions about mental wellness, brain health, and digital wellbeing. How can I help you today?
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <input
+                                type="text"
+                                class="chat-input"
+                                id="chatInput"
+                                placeholder="Type your message here..."
+                                autocomplete="off"
+                            >
+                            <button class="send-button" id="sendButton">
+                                <span>Send</span>
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </button>
+                            <button class="send-button" id="clearChatButton" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <span>Clear</span>
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V4a1 1 0 011-1h6a1 1 0 011 1v3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Articles Page -->
+            <section class="content-section" id="articles">
+                <div class="content-header">
+                    <h2>Articles & Resources</h2>
+                    <p>Learn about digital wellness and cognitive health</p>
+                </div>
+                <div class="card">
+                    <div class="articles-grid" id="articlesGrid"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+
+        const books = {
+            '1': {
+                bookWords: 104845,
+                words: 610,
+                text: `<p>YOU don't know about me without you have read a book by the name of The Adventures of Tom Sawyer; but that ain't no matter. That book was made by Mr. Mark Twain, and he told the truth, mainly. There were things which he stretched, but mainly he told the truth. That is nothing. I never seen anybody but lied one time or another, without it was Aunt Polly, or the widow, or maybe Mary. Aunt Polly--Tom's Aunt Polly, she is--and Mary, and the Widow Douglas is all told about in that book, which is mostly a true book, with some stretchers, as I said before.</p><p>Now the way that the book winds up is this: Tom and me found the money that the robbers hid in the cave, and it made us rich. We got six thousand dollars apiece--all gold. It was an awful sight of money when it was piled up. Well, Judge Thatcher he took it and put it out at interest, and it fetched us a dollar a day apiece all the year round--more than a body could tell what to do with. The Widow Douglas she took me for her son, and allowed she would civilize me; but it was rough living in the house all the time, considering how dismal regular and decent the widow was in all her ways; and so when I couldn't stand it no longer I lit out. I got into my old rags and my sugar-hogshead again, and was free and satisfied. But Tom Sawyer he hunted me up and said he was going to start a band of robbers, and I might join if I would go back to the widow and be respectable. So I went back.</p><p>The widow she cried over me, and called me a poor lost lamb, and she called me a lot of other names, too, but she never meant no harm by it. She put me in them new clothes again, and I couldn't do nothing but sweat and sweat, and feel all cramped up. Well, then, the old thing commenced again. The widow rung a bell for supper, and you had to come to time. When you got to the table you couldn't go right to eating, but you had to wait for the widow to tuck down her head and grumble a little over the victuals, though there weren't really anything the matter with them,--that is, nothing only everything was cooked by itself. In a barrel of odds and ends it is different; things get mixed up, and the juice kind of swaps around, and the things go better.</p><p>After supper she got out her book and learned me about Moses and the Bulrushers, and I was in a sweat to find out all about him; but by and by she let it out that Moses had been dead a considerable long time; so then I didn't care no more about him, because I don't take no stock in dead people.</p><p>Pretty soon I wanted to smoke, and asked the widow to let me. But she wouldn't. She said it was a mean practice and wasn't clean, and I must try to not do it any more. That is just the way with some people. They get down on a thing when they don't know nothing about it. Here she was bothering about Moses, which was no kin to her, and no use to anybody, being gone, you see, yet finding a power of fault with me for doing a thing that had some good in it. And she took snuff, too; of course that was all right, because she done it herself.</p>`,
+                questions: [
+                    {
+                        question: "What is the name of the book that the narrator mentions at the beginning?",
+                        options: ["Tom Sawyer's Adventures", "The Adventures of Tom Sawyer", "Huckleberry Finn's Story", "The Story of Tom"],
+                        correct: 1
+                    },
+                    {
+                        question: "How much money did Tom and the narrator find?",
+                        options: ["Three thousand dollars", "Six thousand dollars each", "Ten thousand dollars", "One thousand dollars"],
+                        correct: 1
+                    },
+                    {
+                        question: "Who took care of the narrator?",
+                        options: ["Aunt Polly", "The Widow Douglas", "Judge Thatcher", "Mary"],
+                        correct: 1
+                    },
+                    {
+                        question: "What did the widow teach the narrator about after supper?",
+                        options: ["Tom Sawyer", "Moses and the Bulrushers", "Judge Thatcher", "Robbers"],
+                        correct: 1
+                    },
+                    {
+                        question: "What practice did the widow not allow the narrator to do?",
+                        options: ["Reading", "Eating fast", "Smoking", "Playing outside"],
+                        correct: 2
+                    }
+                ]
+            },
+            '9': {
+                bookWords: 94698,
+                words: 612,
+                text: `<p>To Sherlock Holmes she is always THE woman. I have seldom heard him mention her under any other name. In his eyes she eclipses and predominates the whole of her sex. It was not that he felt any emotion akin to love for Irene Adler. All emotions, and that one particularly, were abhorrent to his cold, precise but admirably balanced mind. He was, I take it, the most perfect reasoning and observing machine that the world has seen, but as a lover he would have placed himself in a false position. He never spoke of the softer passions, save with a gibe and a sneer. They were admirable things for the observer--excellent for drawing the veil from men's motives and actions. But for the trained reasoner to admit such intrusions into his own delicate and finely adjusted temperament was to introduce a distracting factor which might throw a doubt upon all his mental results. Grit in a sensitive instrument, or a crack in one of his own high-power lenses, would not be more disturbing than a strong emotion in a nature such as his. And yet there was but one woman to him, and that woman was the late Irene Adler, of dubious and questionable memory.</p><p>I had seen little of Holmes lately. My marriage had drifted us away from each other. My own complete happiness, and the home-centred interests which rise up around the man who first finds himself master of his own establishment, were sufficient to absorb all my attention, while Holmes, who loathed every form of society with his whole Bohemian soul, remained in our lodgings in Baker Street, buried among his old books, and alternating from week to week between cocaine and ambition, the drowsiness of the drug, and the fierce energy of his own keen nature. He was still, as ever, deeply attracted by the study of crime, and occupied his immense faculties and extraordinary powers of observation in following out those clues, and clearing up those mysteries which had been abandoned as hopeless by the official police. From time to time I heard some vague account of his doings: of his summons to Odessa in the case of the Trepoff murder, of his clearing up of the singular tragedy of the Atkinson brothers at Trincomalee, and finally of the mission which he had accomplished so delicately and successfully for the reigning family of Holland. Beyond these signs of his activity, however, which I merely shared with all the readers of the daily press, I knew little of my former friend and companion.</p><p>One night--it was on the twentieth of March, 1888--I was returning from a journey to a patient (for I had now returned to civil practice), when my way led me through Baker Street. As I passed the well-remembered door, which must always be associated in my mind with my wooing, and with the dark incidents of the Study in Scarlet, I was seized with a keen desire to see Holmes again, and to know how he was employing his extraordinary powers. His rooms were brilliantly lit, and, even as I looked up, I saw his tall, spare figure pass twice in a dark silhouette against the blind. He was pacing the room swiftly, eagerly, with his head sunk upon his chest and his hands clasped behind him. To me, who knew his every mood and habit, his attitude and manner told their own story. He was at work again. He had risen out of his drug-created dreams and was hot upon the scent of some new problem. I rang the bell and was shown up to the chamber which had formerly been in part my own.</p>`,
+                questions: [
+                    {
+                        question: "What is the name of the woman Sherlock Holmes refers to as 'THE woman'?",
+                        options: ["Mary Watson", "Irene Adler", "Mrs. Hudson", "Martha Holmes"],
+                        correct: 1
+                    },
+                    {
+                        question: "Where did Sherlock Holmes live?",
+                        options: ["Oxford Street", "Baker Street", "London Bridge", "Westminster"],
+                        correct: 1
+                    },
+                    {
+                        question: "What caused the narrator and Holmes to drift apart?",
+                        options: ["A fight", "The narrator's marriage", "Holmes moved away", "Work commitments"],
+                        correct: 1
+                    },
+                    {
+                        question: "On what date did the narrator visit Holmes?",
+                        options: ["March 10, 1888", "March 20, 1888", "April 20, 1888", "March 20, 1889"],
+                        correct: 1
+                    },
+                    {
+                        question: "What was Holmes doing when the narrator saw him through the window?",
+                        options: ["Reading", "Sleeping", "Pacing the room", "Playing violin"],
+                        correct: 2
+                    }
+                ]
+            },
+            '10': {
+                bookWords: 64074,
+                words: 613,
+                text: `<p>"TOM!"</p><p>No answer.</p><p>"TOM!"</p><p>No answer.</p><p>"What's gone with that boy, I wonder? You TOM!"</p><p>No answer.</p><p>The old lady pulled her spectacles down and looked over them about the room; then she put them up and looked out under them. She seldom or never looked THROUGH them for so small a thing as a boy; they were her state pair, the pride of her heart, and were built for "style," not service — she could have seen through a pair of stove-lids just as well. She looked perplexed for a moment, and then said, not fiercely, but still loud enough for the furniture to hear:</p><p>"Well, I lay if I get hold of you I'll — "</p><p>She did not finish, for by this time she was bending down and punching under the bed with the broom, and so she needed breath to punctuate the punches with. She resurrected nothing but the cat.</p><p>"I never did see the beat of that boy!"</p><p>She went to the open door and stood in it and looked out among the tomato vines and "jimpson" weeds that constituted the garden. No Tom. So she lifted up her voice at an angle calculated for distance and shouted:</p><p>"Y-o-u-u TOM!"</p><p>There was a slight noise behind her and she turned just in time to seize a small boy by the slack of his roundabout and arrest his flight.</p><p>"There! I might 'a' thought of that closet. What you been doing in there?"</p><p>"Nothing."</p><p>"Nothing! Look at your hands. And look at your mouth. What IS that truck?"</p><p>"I don't know, aunt."</p><p>"Well, I know. It's jam — that's what it is. Forty times I've said if you didn't let that jam alone I'd skin you. Hand me that switch."</p><p>The switch hovered in the air — the peril was desperate — </p><p>"My! Look behind you, aunt!"</p><p>The old lady whirled round, and snatched her skirts out of danger. The lad fled on the instant, scrambled up the high board-fence, and disappeared over it.</p><p>His aunt Polly stood surprised a moment, and then broke into a gentle laugh.</p><p>"Hang the boy, can't I never learn anything? Ain't he played me tricks enough like that for me to be looking out for him by this time? But old fools is the biggest fools there is. Can't learn an old dog new tricks, as the saying is. But my goodness, he never plays them alike, two days, and how is a body to know what's coming? He 'pears to know just how long he can torment me before I get my dander up, and he knows if he can make out to put me off for a minute or make me laugh, it's all down again and I can't hit him a lick. I ain't doing my duty by that boy, and that's the Lord's truth, goodness knows. Spare the rod and spile the child, as the Good Book says. I'm a laying up sin and suffering for us both, I know. He's full of the Old Scratch, but laws-a-me! he's my own dead sister's boy, poor thing, and I ain't got the heart to lash him, somehow. Every time I let him off, my conscience does hurt me so, and every time I hit him my old heart most breaks. Well-a-well, man that is born of woman is of few days and full of trouble, as the Scripture says, and I reckon it's so. He'll play hookey this evening, and I'll just be obleeged to make him work, to-morrow, to punish him. It's mighty hard to make him work Saturdays, when all the boys is having holiday, but he hates work more than he hates anything else, and I've GOT to do some of my duty by him, or I'll be the ruination of the child."</p>`,
+                questions: [
+                    {
+                        question: "Who is looking for Tom at the beginning?",
+                        options: ["His mother", "Aunt Polly", "His teacher", "The widow"],
+                        correct: 1
+                    },
+                    {
+                        question: "What did Tom have on his hands and mouth?",
+                        options: ["Dirt", "Paint", "Jam", "Ink"],
+                        correct: 2
+                    },
+                    {
+                        question: "How did Tom escape from Aunt Polly?",
+                        options: ["Ran through the door", "Climbed over a fence", "Hid under the bed", "Went out the window"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is Tom's relationship to Aunt Polly?",
+                        options: ["He is her son", "He is her nephew (dead sister's boy)", "He is her grandson", "He is adopted"],
+                        correct: 1
+                    },
+                    {
+                        question: "What does Aunt Polly plan to make Tom do as punishment?",
+                        options: ["Go to bed early", "Work on Saturday", "Stay inside", "Write lines"],
+                        correct: 1
+                    }
+                ]
+            }
+        };
+
+
+        const timer = {
+            startTime: 0,
+            endTime: 0,
+            started: false,
+            wpm: 0,
+            start: function() {
+                this.started = true;
+                this.startTime = new Date().getTime();
+                document.getElementById('startButton').style.display = 'none';
+                document.getElementById('testButton').style.display = 'inline-block';
+                this.display();
+            },
+            stop: function(words) {
+                if(this.started) {
+                    this.endTime = new Date().getTime();
+                    this.started = false;
+                    const timeInMinutes = (this.endTime/1000 - this.startTime/1000) / 60;
+                    this.wpm = Math.round(words / timeInMinutes);
+
+
+                    document.getElementById('testButton').style.display = 'none';
+                    startQuiz();
+                }
+            },
+            display: function() {
+                if(this.started) {
+                    const timeNow = Math.floor(new Date().getTime()) - this.startTime;
+                    this.updateTime(timeNow);
+                    setTimeout(() => timer.display(), 200);
+                }
+            },
+            updateTime: function(time) {
+                time = time/1000;
+                const mins = Math.floor(time/60);
+                let secs = Math.floor(time%60);
+                secs = secs.toString();
+                if(secs.length == 1) {
+                    secs = '0' + secs;
+                }
+                document.getElementById('time').innerHTML = mins + ':' + secs;
+            }
+        };
+
+
+        const modText = {
+            size: function(size) {
+                const container = document.getElementById('testTextCon');
+                container.className = container.className.replace(/fontSmaller|fontLarger/g, '');
+                if(size == 'smaller') {
+                    container.className += ' fontSmaller';
+                } else if(size == 'larger') {
+                    container.className += ' fontLarger';
+                }
+            },
+            lineSpacing: function(size) {
+                const container = document.getElementById('testTextCon');
+                container.className = container.className.replace(/lineSmaller|lineLarger/g, '');
+                if(size == 'smaller') {
+                    container.className += ' lineSmaller';
+                } else if(size == 'larger') {
+                    container.className += ' lineLarger';
+                }
+            }
+        };
+
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let currentBookId = '1';
+
+
+        function changeTestBook() {
+            currentBookId = document.getElementById('testBook').value;
+            document.getElementById('testTextCon').innerHTML = books[currentBookId].text;
+            document.getElementById('testButton').onclick = function() {
+                timer.stop(books[currentBookId].words);
+            };
+        }
+
+
+        function startQuiz() {
+            currentQuestion = 0;
+            userAnswers = [];
+            document.getElementById('quizContainer').classList.add('active');
+            showQuestion();
+        }
+
+
+        function showQuestion() {
+            const questions = books[currentBookId].questions;
+            const question = questions[currentQuestion];
+
+            document.getElementById('quizQuestion').textContent = `Question ${currentQuestion + 1} of ${questions.length}: ${question.question}`;
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'quiz-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = function() {
+                    document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+                    optionDiv.classList.add('selected');
+                    userAnswers[currentQuestion] = index;
+                };
+                optionsContainer.appendChild(optionDiv);
+            });
+        }
+
+
+        document.getElementById('nextQuestion').onclick = function() {
+            if(userAnswers[currentQuestion] === undefined) {
+                alert('Please select an answer');
+                return;
+            }
+
+            currentQuestion++;
+
+            if(currentQuestion < books[currentBookId].questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+
+
+function showResults() {
+    document.getElementById('quizContainer').classList.remove('active');
+
+
+    let correct = 0;
+    const questions = books[currentBookId].questions;
+    userAnswers.forEach((answer, index) => {
+        if(answer === questions[index].correct) {
+            correct++;
+        }
+    });
+
+
+    document.getElementById('wpmResult').textContent = timer.wpm;
+    document.getElementById('quizScore').textContent = `${correct}/${questions.length}`;
+
+
+    let wpmFeedback = '';
+    if (timer.wpm < 200) {
+        wpmFeedback = `Your reading speed is below average. Consider practicing with easier texts or using a reading guide to improve your pace.`;
+    } else if (timer.wpm >= 200 && timer.wpm < 300) {
+        wpmFeedback = `Your reading speed is average. This is a comfortable pace for most readers. Keep practicing to maintain or improve!`;
+    } else if (timer.wpm >= 300 && timer.wpm < 400) {
+        wpmFeedback = `Excellent reading speed! You're reading faster than most adults while maintaining comprehension.`;
+    } else {
+        wpmFeedback = `Outstanding reading speed! You're in the top tier of readers. Make sure comprehension remains strong at this pace.`;
+    }
+    document.getElementById('wpmAnalysis').innerHTML = `<strong>Reading Speed:</strong> ${wpmFeedback}`;
+
+
+    let comprehensionFeedback = '';
+    const percentage = (correct / questions.length) * 100;
+
+    if (correct === 5) {
+        comprehensionFeedback = `Perfect comprehension! You understood the text completely while reading at ${timer.wpm} WPM.`;
+    } else if (correct === 4) {
+        comprehensionFeedback = `Great comprehension! You grasped most key details. Minor review might help catch everything.`;
+    } else if (correct === 3) {
+        comprehensionFeedback = `Good comprehension, but there's room for improvement. Try slowing down slightly to retain more details.`;
+    } else if (correct === 2) {
+        comprehensionFeedback = `Fair comprehension. Consider reading more carefully or reducing your speed to improve understanding.`;
+    } else {
+        comprehensionFeedback = `Low comprehension detected. Focus on understanding rather than speed. Try re-reading difficult passages.`;
+    }
+    document.getElementById('comprehensionAnalysis').innerHTML = `<strong>Comprehension:</strong> ${comprehensionFeedback}`;
+
+    document.getElementById('resultsContainer').classList.add('active');
+}
+
+
+        function restartTest() {
+            document.getElementById('resultsContainer').classList.remove('active');
+            document.getElementById('quizContainer').classList.remove('active');
+            document.getElementById('startButton').style.display = 'inline-block';
+            document.getElementById('testButton').style.display = 'none';
+            document.getElementById('time').textContent = '0:00';
+            timer.started = false;
+            timer.wpm = 0;
+            currentQuestion = 0;
+            userAnswers = [];
+        }
+
+
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                contentSections.forEach(section => section.classList.remove('active'));
+
+                const pageId = link.getAttribute('data-page');
+                document.getElementById(pageId).classList.add('active');
+
+                if (pageId === 'articles') {
+                    loadArticles();
+                }
+            });
+        });
+
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${isUser ? 'user' : 'bot'}`;
+            avatar.textContent = isUser ? '👤' : '🤖';
+
+            const messageContent = document.createElement('div');
+            messageContent.className = `message-content ${isUser ? 'user' : 'bot'}`;
+            messageContent.textContent = content;
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            chatMessages.appendChild(messageDiv);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function loadArticles() {
+            const grid = document.getElementById('articlesGrid');
+            if (!grid) return;
+
+            grid.innerHTML = '<p style="color:#94a3b8">Loading articles...</p>';
+
+            try {
+                const res = await fetch('http://localhost:5000/articles');
+                const data = await res.json();
+
+                grid.innerHTML = '';
+
+                data.articles.forEach(article => {
+                    const div = document.createElement('div');
+                    div.className = 'article-card';
+
+                    div.innerHTML = `
+                        <h3>${article.name}</h3>
+                        <a href="${article.link}" target="_blank">Read article →</a>
+                    `;
+
+                    grid.appendChild(div);
+                });
+
+            } catch (err) {
+                grid.innerHTML = '<p style="color:red">Failed to load articles</p>';
+                console.error(err);
+            }
+        }
+
+        function showTypingIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'typing-indicator active';
+            indicator.id = 'typingIndicator';
+            indicator.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatMessages.appendChild(indicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            chatInput.value = '';
+            sendButton.disabled = true;
+
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('http://localhost:5000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                hideTypingIndicator();
+
+                if (data.response) {
+                    addMessage(data.response, false);
+                } else {
+                    addMessage('Sorry, I encountered an error. Please try again.', false);
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage('Sorry, I cannot connect to the server. Please make sure the backend is running.', false);
+                console.error('Error:', error);
+            }
+
+            sendButton.disabled = false;
+            chatInput.focus();
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        const clearChatButton = document.getElementById('clearChatButton');
+
+        function clearChat() {
+            chatMessages.innerHTML = `
+                <div class="chat-message bot">
+                    <div class="message-avatar bot">🤖</div>
+                    <div class="message-content bot">
+                        Chat cleared. How can I help you now?
+                    </div>
+                </div>
+            `;
+        }
+
+        clearChatButton.addEventListener('click', clearChat);
+
+
+        changeTestBook();
+        document.getElementById('testBook').addEventListener('change', changeTestBook);
+
+
+let digitSpan = {
+    level: 1,
+    sequence: [],
+    attempts: 0,
+    maxAttempts: 2,
+    currentIndex: 0,
+    maxLevel: 0,
+    isRunning: false
+};
+
+function startDigitTest() {
+    digitSpan = {
+        level: 1,
+        sequence: [],
+        attempts: 0,
+        maxAttempts: 2,
+        currentIndex: 0,
+        maxLevel: 0,
+        isRunning: true
+    };
+
+    document.getElementById('startDigitTest').style.display = 'none';
+    document.getElementById('digitResultsContainer').classList.remove('active');
+    document.getElementById('digitFeedback').textContent = '';
+
+    nextDigitLevel();
+}
+
+function generateDigitSequence(length) {
+    const sequence = [];
+    for (let i = 0; i < length; i++) {
+        sequence.push(Math.floor(Math.random() * 10));
+    }
+    return sequence;
+}
+
+function nextDigitLevel() {
+    digitSpan.sequence = generateDigitSequence(digitSpan.level + 2);
+    digitSpan.currentIndex = 0;
+    digitSpan.attempts++;
+
+    document.getElementById('currentLevel').textContent = digitSpan.level;
+    document.getElementById('digitFeedback').textContent = '';
+    document.getElementById('digitAnswer').value = '';
+
+    showDigitSequence();
+}
+
+function showDigitSequence() {
+    document.getElementById('digitDisplay').style.display = 'block';
+    document.getElementById('digitInput').style.display = 'none';
+
+    function showNextDigit() {
+        if (digitSpan.currentIndex < digitSpan.sequence.length) {
+            document.getElementById('digitNumber').textContent = digitSpan.sequence[digitSpan.currentIndex];
+            digitSpan.currentIndex++;
+            setTimeout(showNextDigit, 1000);
+        } else {
+            setTimeout(() => {
+                document.getElementById('digitDisplay').style.display = 'none';
+                document.getElementById('digitInput').style.display = 'block';
+                document.getElementById('digitAnswer').focus();
+            }, 500);
+        }
+    }
+
+    showNextDigit();
+}
+
+function checkDigitAnswer() {
+    const userAnswer = document.getElementById('digitAnswer').value.trim();
+    const correctAnswer = digitSpan.sequence.join('');
+
+    if (userAnswer === correctAnswer) {
+        digitSpan.maxLevel = Math.max(digitSpan.maxLevel, digitSpan.level);
+        digitSpan.level++;
+        digitSpan.attempts = 0;
+
+        document.getElementById('digitFeedback').innerHTML = '<span style="color: #10b981; font-weight: 600;">✓ Correct! Moving to next level...</span>';
+
+        setTimeout(() => {
+            nextDigitLevel();
+        }, 1500);
+    } else {
+        if (digitSpan.attempts >= digitSpan.maxAttempts) {
+            document.getElementById('digitFeedback').innerHTML = '<span style="color: #ef4444; font-weight: 600;">✗ Test Complete</span>';
+
+            setTimeout(() => {
+                showDigitResults();
+            }, 1500);
+        } else {
+            document.getElementById('digitFeedback').innerHTML = '<span style="color: #f59e0b; font-weight: 600;">✗ Incorrect. Try this level again...</span>';
+
+            setTimeout(() => {
+                nextDigitLevel();
+            }, 1500);
+        }
+    }
+}
+
+function showDigitResults() {
+    document.getElementById('digitInput').style.display = 'none';
+    document.getElementById('digitDisplay').style.display = 'none';
+
+    const finalScore = digitSpan.maxLevel + 2;
+    document.getElementById('digitSpanScore').textContent = finalScore;
+
+    let analysis = '';
+    if (finalScore <= 4) {
+        analysis = `Your working memory capacity is below average. This could indicate attention difficulties or may simply need practice. Consider memory training exercises and minimizing distractions during tasks requiring concentration.`;
+    } else if (finalScore >= 5 && finalScore <= 6) {
+        analysis = `Your working memory is in the lower-average range. You can hold basic information but might struggle with complex mental tasks. Regular cognitive exercises can help improve this capacity.`;
+    } else if (finalScore >= 7 && finalScore <= 9) {
+        analysis = `Excellent! Your working memory is in the average to above-average range. You can effectively juggle multiple pieces of information, which is important for learning and problem-solving.`;
+    } else {
+        analysis = `Outstanding working memory capacity! You're in the superior range, able to hold and manipulate significantly more information than most people. This correlates with strong fluid intelligence and learning ability.`;
+    }
+
+    document.getElementById('digitSpanAnalysis').innerHTML = analysis;
+    document.getElementById('digitResultsContainer').classList.add('active');
+    digitSpan.isRunning = false;
+}
+
+function restartDigitTest() {
+    document.getElementById('digitResultsContainer').classList.remove('active');
+    document.getElementById('startDigitTest').style.display = 'block';
+    document.getElementById('digitFeedback').textContent = '';
+}
+
+document.getElementById('startDigitTest').addEventListener('click', startDigitTest);
+document.getElementById('submitDigits').addEventListener('click', checkDigitAnswer);
+document.getElementById('digitAnswer').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        checkDigitAnswer();
+    }
+});
+
+
+document.getElementById('digitAnswer').addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+});
+    </script>
+</body>
+</html>
